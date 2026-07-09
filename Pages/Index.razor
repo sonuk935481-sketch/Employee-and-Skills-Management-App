@@ -1,0 +1,10 @@
+@page "/"
+@inject NavigationManager NavigationManager
+
+@code {
+    protected override void OnInitialized()
+    {
+        // Redirect root to the employees list
+        NavigationManager.NavigateTo("/employees", true);
+    }
+}

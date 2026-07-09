@@ -1,0 +1,43 @@
+﻿@page "/employees/delete/{id:int}"
+@using Employee_and_Skills_Management_App.Model
+@using Microsoft.EntityFrameworkCore
+@inject Employee_and_Skills_Management_App.Data.ApplicationDbContext Db
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete Employee</PageTitle>
+
+<h3>Delete Employee</h3>
+
+@if (employee == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="alert alert-danger">
+        <p>Are you sure you want to delete <strong>@employee.FirstName @employee.LastName</strong>?</p>
+        <p>This action cannot be undone.</p>
+        <button class="btn btn-danger" @onclick="ConfirmDelete">Delete</button>
+        <a class="btn btn-secondary ms-2" href="/employees">Cancel</a>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    private Employee employee;
+
+    protected override async Task OnInitializedAsync()
+    {
+        employee = await Db.Employees.Include(e => e.Skills).FirstOrDefaultAsync(e => e.Id == id);
+    }
+
+    private async Task ConfirmDelete()
+    {
+        if (employee == null) return;
+        Db.Employees.Remove(employee);
+        await Db.SaveChangesAsync();
+        NavigationManager.NavigateTo("/employees");
+    }
+}

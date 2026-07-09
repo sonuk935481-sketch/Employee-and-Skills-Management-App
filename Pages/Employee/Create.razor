@@ -1,0 +1,112 @@
+﻿@page "/employees/create"
+@using Employee_and_Skills_Management_App.Model
+@using Employee_and_Skills_Management_App.Services
+@inject Employee_and_Skills_Management_App.Services.IEmployeeService EmployeeService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create Employee</PageTitle>
+
+<h3>Create Employee</h3>
+
+<EditForm Model="employee" OnValidSubmit="HandleValidSubmit" FormName="createEmployee">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="form-label" for="firstName">First name</label>
+            <input id="firstName" class="form-control form-control-lg" type="text" @bind="employee.FirstName" @bind:event="oninput" />
+            <ValidationMessage For="() => employee.FirstName" />
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label" for="lastName">Last name</label>
+            <input id="lastName" class="form-control form-control-lg" type="text" @bind="employee.LastName" @bind:event="oninput" />
+            <ValidationMessage For="() => employee.LastName" />
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" for="dob">Date of birth</label>
+        <input type="date"
+               class="form-control"
+               @bind="employee.DateOfBirth" />
+        <ValidationMessage For="() => employee.DateOfBirth" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" for="phone">Phone</label>
+        <input id="phone" class="form-control form-control-lg" type="text" @bind="employee.Phone" @bind:event="oninput" />
+        <ValidationMessage For="() => employee.Phone" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Skills</label>
+        <div>
+            @if (skills == null)
+            {
+                <div>Loading skills...</div>
+            }
+            else
+            {
+                @foreach (var s in skills)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="skill_@s.Id" @onchange="e => ToggleSkill(e, s.Id)" checked="@selectedSkillIds.Contains(s.Id)" />
+                        <label class="form-check-label" for="skill_@s.Id">@s.Name</label>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Create</button>
+    <a class="btn btn-secondary ms-2" href="/employees">Back</a>
+</EditForm>
+@code {
+    private List<Skills> skills;
+    private Employee employee = new Employee { DateOfBirth = DateTime.Today.AddYears(-20) };
+    private HashSet<int> selectedSkillIds = new();
+    private string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        skills = await EmployeeService.GetAllSkillsAsync();
+    }
+
+    private void ToggleSkill(ChangeEventArgs e, int skillId)
+    {
+        var isChecked = e.Value is bool b && b;
+        if (isChecked)
+            selectedSkillIds.Add(skillId);
+        else
+            selectedSkillIds.Remove(skillId);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        errorMessage = null;
+        try
+        {
+            var dto = new EmployeeSaveDto
+            {
+                FirstName = employee.FirstName,
+                LastName = employee.LastName,
+                DateOfBirth = employee.DateOfBirth,
+                Phone = employee.Phone,
+                SkillIds = selectedSkillIds.Any() ? selectedSkillIds.ToArray() : Array.Empty<int>()
+            };
+
+            await EmployeeService.SaveEmployeeAsync(dto);
+            NavigationManager.NavigateTo("/employees");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+}
