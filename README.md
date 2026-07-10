@@ -385,5 +385,14 @@ With additional development time, the following features could be added:
 GitHub
 
 https://github.com/sonuk935481-sketch
+Application Screenshots
 
+The following screenshots demonstrate the main features of the application:
 <img width="1911" height="917" alt="image" src="https://github.com/user-attachments/assets/14961dc9-6659-46d1-a6d6-da2e1d548251" />
+ create page 
+<img width="1917" height="911" alt="image" src="https://github.com/user-attachments/assets/b8fe3757-94e9-4dda-a6d4-c1474cadc878" />
+ edit page 
+<img width="1917" height="917" alt="image" src="https://github.com/user-attachments/assets/6b809abf-a7ec-4ee9-9447-18e97e156f0e" />
+ delete 
+<img width="1917" height="911" alt="image" src="https://github.com/user-attachments/assets/2667bcd1-5f45-4bb7-a20b-77137a9f7822" />
+
